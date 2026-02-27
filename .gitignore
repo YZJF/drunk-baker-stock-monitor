@@ -1,0 +1,25 @@
+# 私密笔记（不公开）
+notes.md
+知识点笔记.md
+
+# 抓包原始数据（含敏感信息）
+http_raw.txt
+
+# 含真实密钥的本地副本
+monitor_tiramisu_stock copy.py
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE / 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统文件
+Thumbs.db
+Desktop.ini
+.DS_Store
