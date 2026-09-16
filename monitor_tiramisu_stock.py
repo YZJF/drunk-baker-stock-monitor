@@ -12,7 +12,7 @@ BRANCH_ID = 36839
 API_URL = f"https://nice-api.51hchc.com/menu/branch-product-amount/{BRANCH_ID}"
 NOTIFY_MODE = "both"  # 可选: "restock_only" / "both"
 
-# 这两个是你指定要监控的商品
+# 这些是指定要监控的商品
 TARGET_PRODUCTS = {
     4318174: "提拉米苏焦糖恰巴塔",
     4318176: "布丁巧克力草莓卷",
