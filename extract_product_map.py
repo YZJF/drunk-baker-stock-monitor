@@ -1,11 +1,15 @@
+from __future__ import annotations
+
+import argparse
 import csv
 import json
 import re
 from pathlib import Path
 
 
-INPUT_FILE = Path(r"c:\Users\DELL\Desktop\code\新建文件夹\http_raw.txt")
-OUTPUT_FILE = Path(r"c:\Users\DELL\Desktop\code\新建文件夹\product_map.csv")
+BASE_DIR = Path(__file__).resolve().parent
+DEFAULT_INPUT = BASE_DIR / "http_raw.txt"
+DEFAULT_OUTPUT = BASE_DIR / "product_map.csv"
 
 
 def read_text_with_fallback(path: Path) -> str:
@@ -48,11 +52,32 @@ def split_name_cn_en(name: str) -> tuple[str, str]:
     return cn.strip(), en.strip()
 
 
-def main() -> None:
-    if not INPUT_FILE.exists():
-        raise FileNotFoundError(f"找不到输入文件: {INPUT_FILE}")
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="从菜单接口原始响应提取商品映射表")
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=DEFAULT_INPUT,
+        help="抓包得到的菜单接口原始 JSON 文件，默认使用脚本同目录下的 http_raw.txt",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=DEFAULT_OUTPUT,
+        help="导出的商品对照表，默认写入脚本同目录下的 product_map.csv",
+    )
+    return parser.parse_args()
 
-    text = read_text_with_fallback(INPUT_FILE)
+
+def main() -> None:
+    args = parse_args()
+    input_file = args.input
+    output_file = args.output
+
+    if not input_file.exists():
+        raise FileNotFoundError(f"找不到输入文件: {input_file}")
+
+    text = read_text_with_fallback(input_file)
     payload = extract_json_blob(text)
 
     product_map: dict[int, str] = {}
@@ -76,14 +101,15 @@ def main() -> None:
             }
         )
 
-    with OUTPUT_FILE.open("w", newline="", encoding="utf-8-sig") as f:
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with output_file.open("w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(
             f, fieldnames=["product_id", "name_raw", "name_cn", "name_en"]
         )
         writer.writeheader()
         writer.writerows(rows)
 
-    print(f"已导出 {len(rows)} 条记录 -> {OUTPUT_FILE}")
+    print(f"已导出 {len(rows)} 条记录 -> {output_file}")
 
 
 if __name__ == "__main__":
