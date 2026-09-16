@@ -7,18 +7,17 @@
 ## 一、项目文件结构
 
 ```
-新建文件夹/
+drunk-baker-stock-monitor/
 ├── monitor_tiramisu_stock.py   # 核心：库存监控脚本（定时轮询、状态变化提醒）
 ├── extract_product_map.py      # 工具：从 http_raw.txt 提取 productId ↔ 商品名映射
 ├── product_map.csv             # 输出：提取后的商品对照表（productId / 中文名 / 英文名）
-├── http_raw.txt                # 数据：抓包得到的菜单接口原始 JSON 响应
-├── monitor_half_price.py       # 早期通用监控模板（已被 monitor_tiramisu_stock.py 替代）
 ├── requirements.txt            # Python 依赖
-├── 知识点笔记.md               # 知识点 Q&A（15 个问题，零基础友好）
 ├── README.md                   # 本文件
 ├── 屏幕截图 2026-02-27 110955.png  # 参考：小程序"已售罄"界面截图
-└── 屏幕截图 2026-02-27 111950.png  # 参考：抓包 Network 面板截图
+└── .gitignore                  # 忽略抓包原文和本地笔记，避免提交敏感信息
 ```
+
+抓包后的原始响应请自行放到仓库根目录的 `http_raw.txt`。该文件已加入 `.gitignore`，不会被提交。
 
 ---
 
@@ -60,15 +59,19 @@
 
 ```bash
 # 1. 安装依赖
-# pip install -r requirements.txt
+pip install -r requirements.txt
 
-# 2. 抓包更新，下载/menu/service?hqId=...&branchId=...&platform=... 获取productid和产品中文名的对应http_raw.txt；再复制/menu/branch-product-amount/{branchId}的cURL。 monitor_tiramisu_stock.py 里的 sessionkey / sign / timestamp
+# 2. 抓包后把 /menu/service 的响应保存为仓库根目录的 http_raw.txt，
+#    再把 /menu/branch-product-amount/{branchId} 的 sessionkey / sign / timestamp
+#    更新到 monitor_tiramisu_stock.py 的 HEADERS 占位符中。
 
 # 3. 运行监控
 python monitor_tiramisu_stock.py
 
 # 4. （可选）重新提取商品映射
-# python extract_product_map.py
+python extract_product_map.py
+# 或指定路径：
+# python extract_product_map.py --input http_raw.txt --output product_map.csv
 ```
 
 ---
